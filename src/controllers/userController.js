@@ -80,7 +80,7 @@ exports.login = async (req, res) => {
         id: user.id,
         email: user.email,
         displayName: user.displayName,
-        role: user.role
+        accountType: user.accountType
       }
     });
   } catch (error) {

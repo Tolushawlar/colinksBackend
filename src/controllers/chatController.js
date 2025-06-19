@@ -192,3 +192,38 @@ exports.markAsRead = async (req, res) => {
     res.status(500).json({ message: 'Error marking messages as read', error: error.message });
   }
 };
+
+// Get all chats with pagination
+exports.getAllChats = async (req, res) => {
+  try {
+    const { page = 1, limit = 50 } = req.query;
+    const offset = (page - 1) * limit;
+    
+    const { count, rows: chats } = await ChatMessage.findAndCountAll({
+      include: [
+        {
+          model: User,
+          as: 'sender',
+          attributes: ['id', 'email', 'displayName', 'avatarUrl']
+        },
+        {
+          model: User,
+          as: 'recipient',
+          attributes: ['id', 'email', 'displayName', 'avatarUrl']
+        }
+      ],
+      order: [['timestamp', 'DESC']],
+      limit: parseInt(limit),
+      offset
+    });
+    
+    res.status(200).json({
+      chats,
+      totalPages: Math.ceil(count / limit),
+      currentPage: parseInt(page),
+      totalCount: count
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching all chats', error: error.message });
+  }
+};
