@@ -14,7 +14,7 @@ app.use(helmet()); // Security headers
 // CORS configuration
 app.use(
   cors({
-    origin: ["http://localhost:3001", "http://localhost:3000", "http://localhost:5173", "http://localhost:8080", " https://colink-venture-nexus.vercel.app"], // Your frontend URL
+    origin: ["http://localhost:3001", "http://localhost:3000", "http://localhost:5173", "http://localhost:8080", "https://colink-venture-nexus.vercel.app"], // Your frontend URL
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true // Allow cookies/sessions
