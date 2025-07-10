@@ -17,7 +17,7 @@ const Appointment = sequelize.define('Appointment', {
   },
   businessId: {
     type: DataTypes.UUID,
-    allowNull: false,
+    allowNull: true,
     references: {
       model: 'Businesses',
       key: 'id'
@@ -36,12 +36,46 @@ const Appointment = sequelize.define('Appointment', {
     allowNull: false
   },
   status: {
-    type: DataTypes.ENUM('upcoming', 'completed', 'cancelled'),
-    defaultValue: 'upcoming'
+    type: DataTypes.ENUM('upcoming', 'scheduled', 'completed', 'cancelled'),
+    defaultValue: 'scheduled'
   },
   purpose: {
     type: DataTypes.STRING,
     allowNull: false
+  },
+  meetingTitle: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  duration: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    comment: 'Duration in minutes'
+  },
+  attendeeEmail: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  attendeeName: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+
+  meetingLink: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  creatorId: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: {
+      model: 'Users',
+      key: 'id'
+    }
   }
 }, {
   tableName: 'Appointments'

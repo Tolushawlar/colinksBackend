@@ -1,5 +1,5 @@
 const app = require('./app');
-const { initializeDatabase } = require('./utils/database');
+const supabase = require('./config/supabase');
 require('dotenv').config();
 
 const PORT = process.env.PORT || 3000;
@@ -7,18 +7,21 @@ const PORT = process.env.PORT || 3000;
 // Start server
 const startServer = async () => {
   try {
-    // Initialize database
-    const dbInitialized = await initializeDatabase();
+    // Test Supabase connection
+    const { data, error } = await supabase.from('users').select('count', { count: 'exact', head: true });
     
-    if (!dbInitialized) {
-      console.error('Failed to initialize database. Exiting...');
-      process.exit(1);
+    if (error) {
+      console.error('Supabase connection failed:', error.message);
+      console.log('Please check your SUPABASE_URL and SUPABASE_ANON_KEY in .env file');
+    } else {
+      console.log('✅ Supabase connected successfully');
     }
     
     // Start Express server
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-      console.log(`Environment: ${process.env.NODE_ENV}`);
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`🔗 Database: Supabase`);
     });
   } catch (error) {
     console.error('Error starting server:', error);

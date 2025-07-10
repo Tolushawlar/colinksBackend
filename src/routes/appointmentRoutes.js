@@ -5,6 +5,7 @@ const { auth, isBusinessOwner } = require('../middlewares/auth');
 
 // Protected routes
 router.post('/', auth, appointmentController.createAppointment);
+router.get('/', auth, appointmentController.getUserAppointments);
 router.get('/:id', auth, appointmentController.getAppointmentById);
 router.put('/:id/status', auth, appointmentController.updateAppointmentStatus);
 router.put('/:id/cancel', auth, appointmentController.cancelAppointment);

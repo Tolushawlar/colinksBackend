@@ -7,7 +7,6 @@ const chatRoutes = require('./chatRoutes');
 const postRoutes = require('./postRoutes');
 const emailRoutes = require('./emailRoutes');
 const uploadRoutes = require('./uploadRoutes');
-
 // API routes
 router.use('/users', userRoutes);
 router.use('/businesses', businessRoutes);
