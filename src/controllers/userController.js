@@ -275,3 +275,40 @@ exports.changePassword = async (req, res) => {
     res.status(500).json({ message: 'Error changing password', error: error.message });
   }
 };
+
+// Reset password (no authentication required)
+exports.resetPassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+    
+    if (!email || !newPassword) {
+      return res.status(400).json({ message: 'Email and new password are required' });
+    }
+    
+    // Find user by email
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
+      
+    if (error || !user) {
+      return res.status(404).json({ message: 'User not found with this email' });
+    }
+    
+    // Hash new password and update
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({ password: hashedNewPassword })
+      .eq('email', email);
+
+    if (updateError) {
+      throw new Error(updateError.message);
+    }
+    
+    res.status(200).json({ message: 'Password reset successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error resetting password', error: error.message });
+  }
+};
