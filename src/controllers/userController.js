@@ -217,6 +217,24 @@ exports.updateProfile = async (req, res) => {
       throw new Error(error.message);
     }
     
+    // If avatar URL is being updated, also update business logos owned by this user
+    if (avatarUrl !== undefined) {
+      try {
+        const { error: businessUpdateError } = await supabase
+          .from('businesses')
+          .update({ logo: avatarUrl })
+          .eq('owner_id', req.user.id);
+          
+        if (businessUpdateError) {
+          console.warn('Warning: Failed to update business logos:', businessUpdateError.message);
+        } else {
+          console.log('Successfully updated business logos for user:', req.user.id);
+        }
+      } catch (businessError) {
+        console.warn('Warning: Error updating business logos:', businessError.message);
+      }
+    }
+    
     res.status(200).json({
       message: 'Profile updated successfully',
       user: {
