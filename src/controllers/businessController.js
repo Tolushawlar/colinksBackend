@@ -285,24 +285,18 @@ exports.getBusinessCategories = async (req, res) => {
 // Get partnership categories
 exports.getPartnershipCategories = async (req, res) => {
   try {
-    const { data: businesses, error } = await supabase
+    const { data: categories, error } = await supabase
       .from('businesses')
-      .select('partnership_offers')
-      .not('partnership_offers', 'is', null);
+      .select('industry')
+      .not('industry', 'is', null);
 
     if (error) {
       throw new Error(error.message);
     }
 
-    const categories = new Set();
-    businesses.forEach(business => {
-      if (business.partnership_offers) {
-        const offers = JSON.parse(business.partnership_offers);
-        offers.forEach(offer => categories.add(offer));
-      }
-    });
+    const uniqueCategories = [...new Set(categories.map(item => item.industry))];
 
-    res.status(200).json({ categories: Array.from(categories) });
+    res.status(200).json({ categories: uniqueCategories });
   } catch (error) {
     res.status(500).json({
       message: "Error fetching partnership categories",
@@ -314,24 +308,18 @@ exports.getPartnershipCategories = async (req, res) => {
 // Get sponsorship categories
 exports.getSponsorshipCategories = async (req, res) => {
   try {
-    const { data: businesses, error } = await supabase
+    const { data: categories, error } = await supabase
       .from('businesses')
-      .select('sponsorship_offers')
-      .not('sponsorship_offers', 'is', null);
+      .select('industry')
+      .not('industry', 'is', null);
 
     if (error) {
       throw new Error(error.message);
     }
 
-    const categories = new Set();
-    businesses.forEach(business => {
-      if (business.sponsorship_offers) {
-        const offers = JSON.parse(business.sponsorship_offers);
-        offers.forEach(offer => categories.add(offer));
-      }
-    });
+    const uniqueCategories = [...new Set(categories.map(item => item.industry))];
 
-    res.status(200).json({ categories: Array.from(categories) });
+    res.status(200).json({ categories: uniqueCategories });
   } catch (error) {
     res.status(500).json({
       message: "Error fetching sponsorship categories",
@@ -347,21 +335,13 @@ exports.getBusinessesByPartnershipCategory = async (req, res) => {
     const { data: businesses, error } = await supabase
       .from('businesses')
       .select('*')
-      .not('partnership_offers', 'is', null);
+      .eq('industry', category);
 
     if (error) {
       throw new Error(error.message);
     }
 
-    const filteredBusinesses = businesses.filter(business => {
-      if (business.partnership_offers) {
-        const offers = JSON.parse(business.partnership_offers);
-        return offers.includes(category);
-      }
-      return false;
-    });
-
-    res.status(200).json({ businesses: filteredBusinesses });
+    res.status(200).json({ businesses });
   } catch (error) {
     res.status(500).json({
       message: "Error fetching businesses by partnership category",
@@ -377,21 +357,13 @@ exports.getBusinessesBySponsorshipCategory = async (req, res) => {
     const { data: businesses, error } = await supabase
       .from('businesses')
       .select('*')
-      .not('sponsorship_offers', 'is', null);
+      .eq('industry', category);
 
     if (error) {
       throw new Error(error.message);
     }
 
-    const filteredBusinesses = businesses.filter(business => {
-      if (business.sponsorship_offers) {
-        const offers = JSON.parse(business.sponsorship_offers);
-        return offers.includes(category);
-      }
-      return false;
-    });
-
-    res.status(200).json({ businesses: filteredBusinesses });
+    res.status(200).json({ businesses });
   } catch (error) {
     res.status(500).json({
       message: "Error fetching businesses by sponsorship category",
