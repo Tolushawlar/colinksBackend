@@ -258,3 +258,144 @@ exports.getMyBusinesses = async (req, res) => {
     });
   }
 };
+
+// Get business categories based on industries
+exports.getBusinessCategories = async (req, res) => {
+  try {
+    const { data: categories, error } = await supabase
+      .from('businesses')
+      .select('industry')
+      .not('industry', 'is', null);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const uniqueCategories = [...new Set(categories.map(item => item.industry))];
+
+    res.status(200).json({ categories: uniqueCategories });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error fetching business categories",
+      error: error.message,
+    });
+  }
+};
+
+// Get partnership categories
+exports.getPartnershipCategories = async (req, res) => {
+  try {
+    const { data: businesses, error } = await supabase
+      .from('businesses')
+      .select('partnership_offers')
+      .not('partnership_offers', 'is', null);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const categories = new Set();
+    businesses.forEach(business => {
+      if (business.partnership_offers) {
+        const offers = JSON.parse(business.partnership_offers);
+        offers.forEach(offer => categories.add(offer));
+      }
+    });
+
+    res.status(200).json({ categories: Array.from(categories) });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error fetching partnership categories",
+      error: error.message,
+    });
+  }
+};
+
+// Get sponsorship categories
+exports.getSponsorshipCategories = async (req, res) => {
+  try {
+    const { data: businesses, error } = await supabase
+      .from('businesses')
+      .select('sponsorship_offers')
+      .not('sponsorship_offers', 'is', null);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const categories = new Set();
+    businesses.forEach(business => {
+      if (business.sponsorship_offers) {
+        const offers = JSON.parse(business.sponsorship_offers);
+        offers.forEach(offer => categories.add(offer));
+      }
+    });
+
+    res.status(200).json({ categories: Array.from(categories) });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error fetching sponsorship categories",
+      error: error.message,
+    });
+  }
+};
+
+// Get businesses by partnership category
+exports.getBusinessesByPartnershipCategory = async (req, res) => {
+  try {
+    const { category } = req.params;
+    const { data: businesses, error } = await supabase
+      .from('businesses')
+      .select('*')
+      .not('partnership_offers', 'is', null);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const filteredBusinesses = businesses.filter(business => {
+      if (business.partnership_offers) {
+        const offers = JSON.parse(business.partnership_offers);
+        return offers.includes(category);
+      }
+      return false;
+    });
+
+    res.status(200).json({ businesses: filteredBusinesses });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error fetching businesses by partnership category",
+      error: error.message,
+    });
+  }
+};
+
+// Get businesses by sponsorship category
+exports.getBusinessesBySponsorshipCategory = async (req, res) => {
+  try {
+    const { category } = req.params;
+    const { data: businesses, error } = await supabase
+      .from('businesses')
+      .select('*')
+      .not('sponsorship_offers', 'is', null);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const filteredBusinesses = businesses.filter(business => {
+      if (business.sponsorship_offers) {
+        const offers = JSON.parse(business.sponsorship_offers);
+        return offers.includes(category);
+      }
+      return false;
+    });
+
+    res.status(200).json({ businesses: filteredBusinesses });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error fetching businesses by sponsorship category",
+      error: error.message,
+    });
+  }
+};
